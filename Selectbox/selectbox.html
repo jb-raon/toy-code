@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<style>
+			html, body, div, button, ul,li{ margin:0; padding:0; }
+			li{ list-style:none; }
+			button{ background:none; }
+			h1{ padding:0; margin:0 0 20px 0; font-size:30px; line-height:32px; }
+			.module_select_box{ display:inline-block; position:relative; width:100px; height:40px; }
+			.module_select_box__btn{ width:100px; height:40px; padding:10px; border:1px solid #ccc; text-align:left; font-size:12px; line-height:14px; color:#333;  }
+			.module_select_box__btn:focus{ outline: none;}
+			.module_select_box__list_wrap{ display:none; position:absolute; width:98px; left:0; top:39px; border:1px solid #ccc; background-color:#fff; }
+			.module_select_box__list_wrap.on{ display:block; }
+			.module_select_box__list_wrap li a{ display:block; padding:10px; text-decoration:none; font-size:12px; line-height:14px; color:#333; }
+			.module_select_box__list_wrap li a:hover{ background-color:#ececec; }
+			.module_select_box.active .module_select_box__list_wrap{ display:block; }
+
+		</style>
+	</head>
+	<body>
+		<div class="module_select_box">
+			<button type="button" class="module_select_box__btn">목록</button>
+			<ul class="module_select_box__list_wrap">
+				<li><a href="#none">목록1</a></li>
+				<li><a href="#none">목록2</a></li>
+				<li><a href="#none">목록3</a></li>
+				<li><a href="#none">목록4</a></li>
+			</ul>
+		</div>
+		<div class="module_select_box">
+			<button type="button" class="module_select_box__btn">목록</button>
+			<ul class="module_select_box__list_wrap">
+				<li><a href="#none">목록1</a></li>
+				<li><a href="#none">목록2</a></li>
+				<li><a href="#none">목록3</a></li>
+				<li><a href="#none">목록4</a></li>
+			</ul>
+		</div>
+		<script>
+			var selectbox = (function(){
+				var obj = document.querySelectorAll('.module_select_box'),
+					activeClass = "active";
+
+				function setConstructor(obj){
+					this.initialize(obj);
+					this.bindEvents();
+				}
+				setConstructor.prototype ={
+					initialize :function(wrapperObj){
+						this.selectBoxWrapper = wrapperObj;
+						this.activeButton = this.selectBoxWrapper.querySelector(".module_select_box__btn");
+						this.selectListWrap = this.selectBoxWrapper.querySelector(".module_select_box__list_wrap");
+						this.selectButton = this.selectListWrap.querySelectorAll("li a");
+					},
+					bindEvents :function(){
+						var _this = this;
+
+						this.activeButton.onclick = function(e){
+							_this.toggle(e);
+						}
+						for(var i=0; i<this.selectButton.length; i++){
+							this.selectButton[i].addEventListener("click", function(e){ _this.selected.call(_this, e) } , false);
+						}
+					},
+					toggle : function(e){
+						var selectedButton = e.target;
+						var selectedList = selectedButton.parentNode;
+						var isActive = this.isActive(selectedList);
+
+						if(isActive){
+							this.removeClassPolyfill(selectedList)
+						} else {
+							this.addClassPolyfill(selectedList)
+						}
+					},
+					selected: function(e){
+						var selectedValue = e.target.text;
+						this.activeButton.innerText = selectedValue;
+
+						this.removeClassPolyfill(this.selectBoxWrapper)
+					},
+					addClassPolyfill:function(targetElement){
+						var addTargetElement = targetElement;
+						var classNameArray = addTargetElement.className.split(" ");
+						for(var i in classNameArray){
+							this.isText(classNameArray[i]) ? addTargetElement.className+= " " +activeClass : addTargetElement.className+= activeClass;
+							break;
+						}
+					},
+					removeClassPolyfill:function(targetElement){
+						var removeTargetElement = targetElement;
+						var classNameArray = removeTargetElement.className.split(" ");
+						removeTargetElement.removeAttribute("class");
+						classNameArray.forEach( function(v, i){
+							v === activeClass ? classNameArray.splice(i,1) : false;
+						});
+						for(var u in classNameArray){
+							this.isText(classNameArray[u]) ?
+								!this.isLastIndex(classNameArray.length, u) ?
+									removeTargetElement.classList += classNameArray[u] + " " : removeTargetElement.classList += classNameArray[u]
+								: false;
+						}
+					},
+					isActive : function(targetElement){
+							var classListArray = targetElement.className.split(" ");
+							var isTargetActive = classListArray.some(function(v,i){
+								return v == activeClass;
+							});
+							return isTargetActive;
+					},
+					isText:function(classText){
+						if(classText.length >0 ){
+							return true;
+						} else {
+							return false;
+						}
+					},
+					isLastIndex :function(limit, i){
+						if(limit === (i*1) +1){
+							return true;
+						}
+					}
+				}
+				for(var i=0;i<obj.length;i++){
+					new setConstructor(obj[i]);
+				}
+			}());
+		</script>
+	</body>
+</html>
